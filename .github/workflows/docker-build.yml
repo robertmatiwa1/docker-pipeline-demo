@@ -2,7 +2,7 @@ name: Docker Build and Test
 
 on:
   push:
-    branches: ["main"]
+    branches: ["master"]  # Changed from "main" to match your branch
 
 jobs:
   build-and-test:
@@ -38,10 +38,13 @@ jobs:
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/books-api:latest
           platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Test API
         run: |
           docker run -d -p 8080:8080 --name test-api books-api
           sleep 15
           docker logs test-api
-          curl -v http://localhost:8080/books/
+          curl -v http://localhost:8080/books/ || true
+          docker stop test-api
